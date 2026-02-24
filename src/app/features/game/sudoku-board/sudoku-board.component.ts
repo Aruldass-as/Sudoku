@@ -1,6 +1,7 @@
 import { Component, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Board } from '../../../core/types/sudoku.types';
+import type { PlayerId } from '../../../core/services/game-state.service';
 
 @Component({
   selector: 'app-sudoku-board',
@@ -13,8 +14,14 @@ export class SudokuBoardComponent {
   board = input.required<Board>();
   initialBoard = input.required<Board>();
   disabled = input(false);
+  cellOwners = input<Record<string, PlayerId>>({});
 
   cellChange = output<{ row: number; col: number; value: number }>();
+
+  getCellOwner(row: number, col: number): PlayerId | null {
+    const owners = this.cellOwners();
+    return owners[`${row},${col}`] ?? null;
+  }
 
   readonly selectedCell = signal<{ row: number; col: number } | null>(null);
 

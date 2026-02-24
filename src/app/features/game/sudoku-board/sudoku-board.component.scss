@@ -41,6 +41,24 @@
     color: var(--text-primary);
   }
 
+  &--player1 {
+    background: var(--player1-bg);
+    color: var(--player1-color);
+
+    input {
+      color: var(--player1-color);
+    }
+  }
+
+  &--player2 {
+    background: var(--player2-bg);
+    color: var(--player2-color);
+
+    input {
+      color: var(--player2-color);
+    }
+  }
+
   &--selected {
     background: var(--accent-subtle);
     outline: 2px solid var(--accent);

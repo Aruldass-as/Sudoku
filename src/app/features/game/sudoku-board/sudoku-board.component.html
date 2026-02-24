@@ -5,6 +5,8 @@
         <div
           class="sudoku-board__cell"
           [class.sudoku-board__cell--fixed]="isFixed(row, col)"
+          [class.sudoku-board__cell--player1]="getCellOwner(row, col) === 1"
+          [class.sudoku-board__cell--player2]="getCellOwner(row, col) === 2"
           [class.sudoku-board__cell--selected]="
             selectedCell()?.row === row && selectedCell()?.col === col
           "

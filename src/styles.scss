@@ -13,10 +13,18 @@
   --accent: #2563eb;
   --accent-hover: #1d4ed8;
   --accent-subtle: #dbeafe;
+  --player1-bg: #dbeafe;
+  --player1-color: #1d4ed8;
+  --player2-bg: #dcfce7;
+  --player2-color: #15803d;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --player1-bg: #1e3a5f;
+    --player1-color: #60a5fa;
+    --player2-bg: #14532d;
+    --player2-color: #4ade80;
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
     --bg-tertiary: #334155;

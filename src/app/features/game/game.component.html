@@ -4,55 +4,149 @@
     <p class="subtitle">Classic number puzzle</p>
   </header>
 
-  <section class="controls" aria-label="Game controls">
-    <div class="difficulty-section">
-      <label for="difficulty">Difficulty</label>
-      <select
-        id="difficulty"
-        [value]="selectedDifficulty"
-        (change)="selectedDifficulty = $any($event.target).value"
-        [disabled]="isLoading()"
-      >
-        @for (d of difficulties; track d.value) {
-          <option [value]="d.value">{{ d.label }}</option>
-        }
-      </select>
-      <button
-        type="button"
-        class="btn btn-primary"
-        (click)="startGame()"
-        [disabled]="isLoading()"
-      >
-        {{ board().length ? 'New Game' : 'Start Game' }}
-      </button>
-    </div>
+  <div class="mode-selector">
+    <button
+      type="button"
+      class="mode-btn"
+      [class.mode-btn--active]="mode() === 'single'"
+      (click)="setMode('single')"
+    >
+      Single Player
+    </button>
+    <button
+      type="button"
+      class="mode-btn"
+      [class.mode-btn--active]="mode() === 'multiplayer'"
+      (click)="setMode('multiplayer')"
+    >
+      Multiplayer
+    </button>
+  </div>
 
-    @if (isPlaying() || isSolved()) {
-      <div class="action-buttons">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="validate()"
+  @if (mode() === 'single') {
+    <section class="controls" aria-label="Game controls">
+      <div class="difficulty-section">
+        <label for="difficulty">Difficulty</label>
+        <select
+          id="difficulty"
+          [value]="selectedDifficulty"
+          (change)="selectedDifficulty = $any($event.target).value"
           [disabled]="isLoading()"
         >
-          Validate
-        </button>
+          @for (d of difficulties; track d.value) {
+            <option [value]="d.value">{{ d.label }}</option>
+          }
+        </select>
         <button
           type="button"
-          class="btn btn-secondary"
-          (click)="solve()"
+          class="btn btn-primary"
+          (click)="startGame()"
           [disabled]="isLoading()"
         >
-          Solve
+          {{ board().length ? 'New Game' : 'Start Game' }}
         </button>
-        @if (isPlaying()) {
-          <button type="button" class="btn btn-outline" (click)="reset()">
-            Reset
-          </button>
-        }
       </div>
-    }
-  </section>
+
+      @if (isPlaying() || isSolved() || status() === 'broken') {
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="validate()"
+            [disabled]="isLoading()"
+          >
+            Validate
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="solve()"
+            [disabled]="isLoading()"
+          >
+            Solve
+          </button>
+          @if (isPlaying() || status() === 'broken') {
+            <button type="button" class="btn btn-outline" (click)="reset()">
+              Reset
+            </button>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @if (mode() === 'multiplayer') {
+    <section class="controls multiplayer-controls" aria-label="Multiplayer controls">
+      @if (!board().length) {
+        <div class="multiplayer-start">
+          <p>Two players take turns. Complete rows or columns to score points.</p>
+          <div class="difficulty-section">
+            <label for="difficulty-mp">Difficulty</label>
+            <select
+              id="difficulty-mp"
+              [value]="selectedDifficulty"
+              (change)="selectedDifficulty = $any($event.target).value"
+              [disabled]="isLoading()"
+            >
+              @for (d of difficulties; track d.value) {
+                <option [value]="d.value">{{ d.label }}</option>
+              }
+            </select>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="startGame()"
+              [disabled]="isLoading()"
+            >
+              Start Game
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="multiplayer-info">
+          <div class="score-board">
+            <div class="score-item" [class.score-item--active]="currentPlayer() === 1">
+              <span class="score-label">Player 1</span>
+              <span class="score-value">{{ player1Score() }}</span>
+            </div>
+            <div class="score-item" [class.score-item--active]="currentPlayer() === 2">
+              <span class="score-label">Player 2</span>
+              <span class="score-value">{{ player2Score() }}</span>
+            </div>
+          </div>
+          <p class="turn-indicator">
+            {{ currentPlayer() === 1 ? "Player 1's turn" : "Player 2's turn" }}
+          </p>
+        </div>
+        <div class="action-buttons">
+          <button type="button" class="btn btn-outline" (click)="newMultiplayerGame()">
+            New Game
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="validate()"
+            [disabled]="isLoading()"
+          >
+            Validate
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="solve()"
+            [disabled]="isLoading()"
+          >
+            Solve
+          </button>
+          @if (isPlaying() || status() === 'broken') {
+            <button type="button" class="btn btn-outline" (click)="reset()">
+              Reset
+            </button>
+          }
+        </div>
+      }
+    </section>
+  }
 
   @if (message()) {
     <div
@@ -76,10 +170,11 @@
     <app-sudoku-board
       [board]="board()"
       [initialBoard]="initialBoard()"
+      [cellOwners]="cellOwners()"
       [disabled]="!isPlaying()"
       (cellChange)="gameState.updateCell($event.row, $event.col, $event.value)"
     />
-  } @else if (!isLoading()) {
+  } @else if (!isLoading() && mode() === 'single') {
     <div class="welcome">
       <p>Select a difficulty and click <strong>Start Game</strong> to begin.</p>
     </div>
