@@ -1,0 +1,34 @@
+<div class="sudoku-board" [class.sudoku-board--disabled]="disabled()">
+  @for (row of rows(); track row) {
+    <div class="sudoku-board__row">
+      @for (col of cols(); track col) {
+        <div
+          class="sudoku-board__cell"
+          [class.sudoku-board__cell--fixed]="isFixed(row, col)"
+          [class.sudoku-board__cell--selected]="
+            selectedCell()?.row === row && selectedCell()?.col === col
+          "
+          [class.sudoku-board__cell--thick-right]="col === 2 || col === 5"
+          [class.sudoku-board__cell--thick-bottom]="row === 2 || row === 5"
+        >
+          @if (isFixed(row, col)) {
+            <span class="sudoku-board__value">{{ getCellValue(row, col) }}</span>
+          } @else {
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[1-9]"
+              maxlength="1"
+              [value]="getCellValue(row, col) || ''"
+              (input)="onInput($event, row, col)"
+              (keydown)="onKeydown($event, row, col)"
+              (focus)="selectCell(row, col)"
+              [disabled]="disabled()"
+              [attr.aria-label]="'Cell row ' + (row + 1) + ' column ' + (col + 1)"
+            />
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

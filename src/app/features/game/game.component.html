@@ -1,0 +1,87 @@
+<div class="game-container">
+  <header class="game-header">
+    <h1>Sudoku</h1>
+    <p class="subtitle">Classic number puzzle</p>
+  </header>
+
+  <section class="controls" aria-label="Game controls">
+    <div class="difficulty-section">
+      <label for="difficulty">Difficulty</label>
+      <select
+        id="difficulty"
+        [value]="selectedDifficulty"
+        (change)="selectedDifficulty = $any($event.target).value"
+        [disabled]="isLoading()"
+      >
+        @for (d of difficulties; track d.value) {
+          <option [value]="d.value">{{ d.label }}</option>
+        }
+      </select>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="startGame()"
+        [disabled]="isLoading()"
+      >
+        {{ board().length ? 'New Game' : 'Start Game' }}
+      </button>
+    </div>
+
+    @if (isPlaying() || isSolved()) {
+      <div class="action-buttons">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="validate()"
+          [disabled]="isLoading()"
+        >
+          Validate
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="solve()"
+          [disabled]="isLoading()"
+        >
+          Solve
+        </button>
+        @if (isPlaying()) {
+          <button type="button" class="btn btn-outline" (click)="reset()">
+            Reset
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  @if (message()) {
+    <div
+      class="message"
+      [class.message--success]="status() === 'solved'"
+      [class.message--error]="status() === 'broken' || status() === 'unsolvable'"
+      role="status"
+    >
+      {{ message() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading" role="status" aria-live="polite">
+      <span class="spinner"></span>
+      <span>Loading...</span>
+    </div>
+  }
+
+  @if (board().length) {
+    <app-sudoku-board
+      [board]="board()"
+      [initialBoard]="initialBoard()"
+      [disabled]="!isPlaying()"
+      (cellChange)="gameState.updateCell($event.row, $event.col, $event.value)"
+    />
+  } @else if (!isLoading()) {
+    <div class="welcome">
+      <p>Select a difficulty and click <strong>Start Game</strong> to begin.</p>
+    </div>
+  }
+</div>
